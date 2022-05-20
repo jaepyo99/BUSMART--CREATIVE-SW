@@ -1,0 +1,48 @@
+#include<SoftwareSerial.h> //블루투스 통신 라이브러리
+SoftwareSerial bt(3,4);//txd , rxd 핀번호
+int touch_s = 2; // Touch sensor pin number
+int ledPin=13; // Led pin number
+int state=LOW; // Led state
+int reading;// Touch sensor state
+int buzzerpin=8; //buzzer sensor pin number
+String myString="";
+void alarm(int ledpin,int buzzerpin) //led 와 buzzer 실행함수
+{
+  Serial.println("내립니다.");
+  digitalWrite(ledPin,HIGH);
+  digitalWrite(buzzerpin,HIGH);
+  delay(1000);
+  digitalWrite(ledPin,LOW);
+  digitalWrite(buzzerpin,LOW);
+  reading=LOW;
+}
+void setup()
+{
+ Serial.begin(115200); // pc - 아두이노간 통신
+ Serial.println("Bus Bell"); 
+ pinMode(touch_s, INPUT);
+ pinMode(ledPin,OUTPUT);
+ pinMode(buzzerpin,OUTPUT);
+ bt.begin(115200); //스마트폰 - 아두이노간 통신
+}
+void loop()
+{
+  while(bt.available()) //블루투스로 무언가 수신했다면
+  {
+    Serial.println(bt.read());
+    char myChar=(char)bt.read();
+    myString+=myChar;
+    delay(5);
+  }
+  reading=digitalRead(touch_s); //터치했다면, touch_sensor를 HIGH 상태로
+  digitalWrite(buzzerpin,LOW); //buzzer sensor를 LOW상태로
+  if(reading==HIGH) //터치됬다면
+  {
+    alarm(ledPin,buzzerpin);
+  }
+  if(!myString.equals(""))//무언가 수신됬다면
+  {//블루투스 모듈을 통해 뭔가 수신된다면
+    alarm(ledPin,buzzerpin)
+    myString="";
+  }
+}
