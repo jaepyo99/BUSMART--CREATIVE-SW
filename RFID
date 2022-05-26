@@ -1,13 +1,14 @@
 #include <SPI.h>
 #include <MFRC522.h>
-//MISO 12 MOSI 11 SCK 13 SDA 10
+#include <string.h>
 #define SS_PIN 10
-#define RST_PIN 9
- 
+#define RST_PIN 3
+int first_card_price=10000;
+#define bus_price 1000
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance of the class
 
 MFRC522::MIFARE_Key key; 
-
+String first_card="533993a9";
 void setup() { 
   Serial.begin(9600); //pc - 아두이노
   SPI.begin(); // Init SPI bus
@@ -29,11 +30,29 @@ for(int i=0;i<4;i++)
 {
   output+=String(rfid.uid.uidByte[i],HEX);
 }
-  Serial.println(output);
-
+//1번 카드가 찍혔을때 버스비 계산
+if(output.equals(first_card))
+{
+  if(first_card_price<1000)
+  {
+    Serial.println("잔액이 부족합니다.");
+    delay(1000);
+    return;
+  }
+  first_card_price=first_card_price-bus_price;
+  Serial.print(first_card_price);
+  Serial.println("원 남았습니다.");
+}
+else
+{
+  Serial.println("등록되지 않은 카드입니다.");
+}
+/* 끝나는 코드 */
   // Halt PICC
   rfid.PICC_HaltA();
 
   // Stop encryption on PCD
   rfid.PCD_StopCrypto1();
+
+ 
 }
