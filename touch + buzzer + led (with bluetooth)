@@ -27,10 +27,10 @@ void alarm(int ledpin,int buzzerpin) //led 와 buzzer 실행함수 알람함수
 }
 
 void setup()
-{
- Serial.println("Bus Set"); 
+{ 
  Serial.begin(9600); // pc - 아두이노간 통신
  bt.begin(9600); //스마트폰 - 아두이노간 통신 
+ Serial.println("Bus Set"); 
  pinMode(touch_s, INPUT);
  pinMode(ledPin,OUTPUT);
  pinMode(buzzerpin,OUTPUT);
@@ -41,20 +41,19 @@ void setup()
 void loop()
 {
 // 다음 정류장에서 멈춰야한다는 신호
-	if(BTSerial.available())
-	{
-		String Busnum = (String)BTSerial.readString();
+  if(BTSerial.available())
+  {
+    String Busnum = (String)BTSerial.readString();
   if (Busnum.equals(string1))
-	{
-		Serial.println(Busnum);
-		digitalWrite(LEDgreen, HIGH);
-	}
-	else 
-	{
-		Serial.println("NONO!!");
-	}
-	}
-}
+  {
+    Serial.println(Busnum);
+    digitalWrite(LEDgreen, HIGH);
+  }
+  else 
+  {
+    Serial.println("NONO!!");
+  }
+  }
 
 // 하차벨을 눌렀을때
   while(bt.available()) //블루투스로 무언가 수신했다면
@@ -72,7 +71,7 @@ void loop()
   }
   if(!myString.equals(""))//무언가 수신됬다면
   {//블루투스 모듈을 통해 뭔가 수신된다면
-    alarm(ledPin,buzzerpin)
+    alarm(ledPin,buzzerpin);
     myString="";
   }
 }
