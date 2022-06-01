@@ -1,12 +1,21 @@
+// 라이브러리 선언 및 핀번호 할당
 #include<SoftwareSerial.h> //블루투스 통신 라이브러리
-SoftwareSerial bt(3,4);//txd , rxd 핀번호
-int touch_s = 2; // Touch sensor pin number
-int ledPin=13; // Led pin number
+#define LEDgreen 1
+String string1;
+//버스에서 장애인 정보 받는 블루투스
+SoftwareSerial BTSerial(2,3);
+//버스하차벨 블루투스
+SoftwareSerial bt(4,5);//txd , rxd 핀번호
+int touch_s = 6; // Touch sensor pin number
+int ledPin=7; // Led pin number
 int state=LOW; // Led state
 int reading;// Touch sensor state
 int buzzerpin=8; //buzzer sensor pin number
 String myString="";
-void alarm(int ledpin,int buzzerpin) //led 와 buzzer 실행함수
+// end
+
+
+void alarm(int ledpin,int buzzerpin) //led 와 buzzer 실행함수 알람함수
 {
   Serial.println("내립니다.");
   digitalWrite(ledPin,HIGH);
@@ -16,17 +25,38 @@ void alarm(int ledpin,int buzzerpin) //led 와 buzzer 실행함수
   digitalWrite(buzzerpin,LOW);
   reading=LOW;
 }
+
 void setup()
 {
- Serial.begin(115200); // pc - 아두이노간 통신
- Serial.println("Bus Bell"); 
+ Serial.println("Bus Set"); 
+ Serial.begin(9600); // pc - 아두이노간 통신
+ bt.begin(9600); //스마트폰 - 아두이노간 통신 
  pinMode(touch_s, INPUT);
  pinMode(ledPin,OUTPUT);
  pinMode(buzzerpin,OUTPUT);
- bt.begin(115200); //스마트폰 - 아두이노간 통신
+ pinMode(LEDgreen,OUTPUT);
+ string1 = String("2015");
 }
+
 void loop()
 {
+// 다음 정류장에서 멈춰야한다는 신호
+	if(BTSerial.available())
+	{
+		String Busnum = (String)BTSerial.readString();
+  if (Busnum.equals(string1))
+	{
+		Serial.println(Busnum);
+		digitalWrite(LEDgreen, HIGH);
+	}
+	else 
+	{
+		Serial.println("NONO!!");
+	}
+	}
+}
+
+// 하차벨을 눌렀을때
   while(bt.available()) //블루투스로 무언가 수신했다면
   {
     Serial.println(bt.read());
